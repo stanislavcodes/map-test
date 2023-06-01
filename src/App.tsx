@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Button,Flex } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Map } from '~/components/Map';
+import { useGetPlaces } from './api/useGetPlaces';
+import { FormModal } from './components/AddForm';
+import { SelectedPlace } from './types/SelectedPlace';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { data: places = [] } = useGetPlaces();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<SelectedPlace>(null);
+
+  const openModal = () => setIsModalOpen(true);
+
+  const closeModal = (latitude?: number, longitude?: number) => {
+    setIsModalOpen(false);
+
+    if (latitude && longitude) {
+      setSelectedPlace({ latitude, longitude });
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Flex
+      direction={'column'}
+      w={'100%'}
+      h={'100vh'}
+      p={{ base: 4, md: 6 }}
+      gap={4}
+    >
+      <Flex gap={4}>
+        <Button onClick={openModal} colorScheme="green">
+          Add place
+        </Button>
+
+        <FormModal isOpen={isModalOpen} onClose={closeModal} />
+      </Flex>
+
+      <Map places={places} selectedPlace={selectedPlace} />
+    </Flex>
+  );
 }
 
-export default App
+export default App;
