@@ -38,7 +38,7 @@ export const Map = ({ places, selectedPlace }: MapProps) => {
             : [50.44, 30.51]
         }
         zoom={10}
-        scrollWheelZoom={false}
+        scrollWheelZoom={true}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
