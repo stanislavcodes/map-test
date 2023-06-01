@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Place } from '~/types/Place';
 import { PlacePayload } from '~/types/PlacePayload';
-import { put } from '~/utils/requests';
+import { patch } from '~/utils/requests';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -9,8 +9,8 @@ export const useUpdatePlace = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (place: PlacePayload) =>
-      put<PlacePayload, Place>(`${API_URL}/place`, {
+    mutationFn: (place: Place) =>
+      patch<PlacePayload, Place>(`${API_URL}/place/${place.id}`, {
         name: place.name,
         description: place.description,
         latitude: place.latitude,

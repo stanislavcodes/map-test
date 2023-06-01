@@ -21,15 +21,15 @@ export const post = async <Payload, Response>(
   }
 };
 
-export const put = async <Payload, Response>(
+export const patch = async <Payload, Response>(
   url: string,
   body: Payload,
 ): Promise<Response> => {
   try {
-    const response: AxiosResponse<Response> = await axios.put(url, body);
+    const response: AxiosResponse<Response> = await axios.patch(url, body);
     return response.data;
   } catch (error) {
-    throw new Error(`PUT request to ${url} failed`);
+    throw new Error(`PATCH request to ${url} failed`);
   }
 };
 

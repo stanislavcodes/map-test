@@ -1,6 +1,7 @@
 import {
   Button,
   Divider,
+  Flex,
   Heading,
   Spinner,
   Text,
@@ -11,9 +12,10 @@ import { Place } from '~/types/Place';
 
 interface PlacePopupProps {
   place: Place;
+  onEdit: () => void;
 }
 
-export const PlaceInfo = ({ place }: PlacePopupProps) => {
+export const PlaceInfo = ({ place, onEdit }: PlacePopupProps) => {
   const { name, description } = place;
   const { mutate: deletePlace, isLoading, isSuccess } = useDeletePlace();
 
@@ -39,14 +41,26 @@ export const PlaceInfo = ({ place }: PlacePopupProps) => {
 
       <Divider />
 
-      <Button
-        size={'sm'}
-        variant="ghost"
-        onClick={handleDelete}
-        isDisabled={isLoading}
-      >
-        Delete
-      </Button>
+      <Flex w={'100%'} gap={1}>
+        <Button
+          colorScheme="green"
+          size={'sm'}
+          onClick={onEdit}
+          flexGrow={1}
+          isDisabled={isLoading}
+        >
+          Edit
+        </Button>
+        <Button
+          size={'sm'}
+          variant="ghost"
+          onClick={handleDelete}
+          flexGrow={1}
+          isDisabled={isLoading}
+        >
+          Delete
+        </Button>
+      </Flex>
     </VStack>
   );
 };

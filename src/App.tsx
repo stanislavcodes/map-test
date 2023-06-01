@@ -1,24 +1,32 @@
 import { Button,Flex } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useCallback,useState } from 'react';
 import { Map } from '~/components/Map';
 import { useGetPlaces } from './api/useGetPlaces';
 import { FormModal } from './components/AddForm';
-import { SelectedPlace } from './types/SelectedPlace';
+import { Coords } from './types/Coords';
+import { Place } from './types/Place';
 
 function App() {
   const { data: places = [] } = useGetPlaces();
+  const [editData, setEditData] = useState<Place | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPlace, setSelectedPlace] = useState<SelectedPlace>(null);
+  const [addedPlace, setAddedPlace] = useState<Coords>(null);
 
   const openModal = () => setIsModalOpen(true);
 
   const closeModal = (latitude?: number, longitude?: number) => {
+    setEditData(null);
     setIsModalOpen(false);
 
     if (latitude && longitude) {
-      setSelectedPlace({ latitude, longitude });
+      setAddedPlace({ latitude, longitude });
     }
   };
+
+  const startEditing = useCallback((place: Place) => {
+    setIsModalOpen(true);
+    setEditData(place);
+  }, []);
 
   return (
     <Flex
@@ -33,10 +41,14 @@ function App() {
           Add place
         </Button>
 
-        <FormModal isOpen={isModalOpen} onClose={closeModal} />
+        <FormModal
+          isOpen={isModalOpen}
+          initialData={editData}
+          onClose={closeModal}
+        />
       </Flex>
 
-      <Map places={places} selectedPlace={selectedPlace} />
+      <Map places={places} addedPlace={addedPlace} onEdit={startEditing} />
     </Flex>
   );
 }

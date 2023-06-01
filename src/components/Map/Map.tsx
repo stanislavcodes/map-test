@@ -2,27 +2,28 @@ import { Box } from '@chakra-ui/react';
 import { Map as MapType } from 'leaflet';
 import { useEffect, useRef } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { Coords } from '~/types/Coords';
 import { Place } from '~/types/Place';
-import { SelectedPlace } from '~/types/SelectedPlace';
 import { PlaceInfo } from '../PlaceInfo';
 
 interface MapProps {
   places: Place[];
-  selectedPlace: SelectedPlace;
+  addedPlace: Coords;
+  onEdit: (place: Place) => void;
 }
 
-export const Map = ({ places, selectedPlace }: MapProps) => {
+export const Map = ({ places, addedPlace, onEdit }: MapProps) => {
   const mapRef = useRef<MapType>(null);
 
   useEffect(() => {
-    if (mapRef.current && selectedPlace) {
+    if (mapRef.current && addedPlace) {
       const map = mapRef.current;
 
       if (map) {
-        map.setView([selectedPlace.latitude, selectedPlace.longitude], 7);
+        map.setView([addedPlace.latitude, addedPlace.longitude], 7);
       }
     }
-  }, [selectedPlace]);
+  }, [addedPlace]);
 
   return (
     <Box flexGrow={1}>
@@ -33,8 +34,8 @@ export const Map = ({ places, selectedPlace }: MapProps) => {
           borderRadius: '8px',
         }}
         center={
-          selectedPlace
-            ? [selectedPlace.latitude, selectedPlace.longitude]
+          addedPlace
+            ? [addedPlace.latitude, addedPlace.longitude]
             : [50.44, 30.51]
         }
         zoom={10}
@@ -49,7 +50,7 @@ export const Map = ({ places, selectedPlace }: MapProps) => {
         {places.map(place => (
           <Marker key={place.id} position={[place.latitude, place.longitude]}>
             <Popup>
-              <PlaceInfo place={place} />
+              <PlaceInfo place={place} onEdit={() => onEdit(place)} />
             </Popup>
           </Marker>
         ))}

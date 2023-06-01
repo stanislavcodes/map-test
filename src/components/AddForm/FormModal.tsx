@@ -13,51 +13,88 @@ import {
   Textarea,
   VStack,
 } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useCreatePlace } from '~/api/useCreatePlace';
-
-interface FormValues {
-  name: string;
-  description: string;
-  latitude: number | '';
-  longitude: number | '';
-}
+import { useUpdatePlace } from '~/api/useUpdatePlace';
+import { Place } from '~/types/Place';
+import { PlacePayload } from '~/types/PlacePayload';
 
 interface FormModalProps {
   isOpen: boolean;
+  initialData: Place | null;
   onClose: (latitude?: number, longitude?: number) => void;
 }
 
-export const FormModal = ({ isOpen, onClose }: FormModalProps) => {
+export const FormModal = ({ isOpen, initialData, onClose }: FormModalProps) => {
+  const [editData, setEditData] = useState<PlacePayload | null>(null);
+
   const {
     handleSubmit,
     register,
     reset,
+    setValue,
+    getValues,
     formState: { errors, isSubmitting, isSubmitSuccessful },
-  } = useForm<FormValues>();
+  } = useForm<PlacePayload>({
+    defaultValues: {
+      name: editData?.name || '',
+      description: editData?.description || '',
+      latitude: editData?.latitude || 0,
+      longitude: editData?.longitude || 0,
+    },
+  });
 
   useEffect(() => {
     if (isSubmitSuccessful) {
-      reset({
-        name: '',
-        description: '',
-        latitude: '',
-        longitude: '',
-      });
+      const { latitude, longitude } = getValues();
+
+      onCloseModal(latitude, longitude);
     }
   }, [isSubmitSuccessful, reset]);
 
-  const { mutate: createPlace, isLoading } = useCreatePlace();
+  useEffect(() => {
+    if (initialData) {
+      setEditData(initialData);
+      setValue('name', initialData.name);
+      setValue('description', initialData.description);
+      setValue('latitude', initialData.latitude);
+      setValue('longitude', initialData.longitude);
+    }
+  }, [initialData]);
 
-  const onSubmit: SubmitHandler<FormValues> = async values => {
-    createPlace({
+  const { mutate: createPlace, isLoading: isCreating } = useCreatePlace();
+  const { mutate: updatePlace, isLoading: isUpdating } = useUpdatePlace();
+
+  const onSubmit: SubmitHandler<PlacePayload> = async values => {
+    const data = {
       ...values,
       latitude: Number(values.latitude),
       longitude: Number(values.longitude),
-    });
+    };
 
-    onClose(Number(values.latitude), Number(values.longitude));
+    if (editData && initialData) {
+      updatePlace({
+        id: initialData.id,
+        ...data,
+      });
+    } else {
+      createPlace({
+        ...data,
+      });
+    }
+  };
+
+  const onCloseModal = (latitude?: number, longitude?: number) => {
+    setEditData(null);
+
+    if (latitude && longitude) {
+      onClose(latitude, longitude);
+    } else {
+      onClose();
+    }
+
+    reset();
   };
 
   return (
@@ -117,7 +154,7 @@ export const FormModal = ({ isOpen, onClose }: FormModalProps) => {
               </FormControl>
 
               <FormControl
-                isDisabled={isSubmitting}
+                isDisabled={isSubmitting || !!editData}
                 isInvalid={!!errors.latitude}
               >
                 <FormLabel>{'Latitude (-90, 90):'}</FormLabel>
@@ -139,7 +176,7 @@ export const FormModal = ({ isOpen, onClose }: FormModalProps) => {
               </FormControl>
 
               <FormControl
-                isDisabled={isSubmitting}
+                isDisabled={isSubmitting || !!editData}
                 isInvalid={!!errors.longitude}
               >
                 <FormLabel>{'Longitude (-180, 180):'}</FormLabel>
@@ -164,10 +201,10 @@ export const FormModal = ({ isOpen, onClose }: FormModalProps) => {
                 type="submit"
                 colorScheme="green"
                 width="full"
-                isLoading={isLoading}
-                loadingText="Creating"
+                isLoading={isCreating || isUpdating}
+                loadingText={editData ? 'Updating' : 'Creating'}
               >
-                Create
+                {editData ? 'Update' : 'Create'}
               </Button>
             </VStack>
           </form>
