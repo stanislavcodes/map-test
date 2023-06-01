@@ -100,7 +100,7 @@ export const FormModal = ({ isOpen, initialData, onClose }: FormModalProps) => {
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={onCloseModal}
       isCentered
       size={{ base: 'full', md: 'md' }}
     >
