@@ -38,6 +38,8 @@ export const Map = ({ places, selectedPlace }: MapProps) => {
             : [50.44, 30.51]
         }
         zoom={10}
+        minZoom={3}
+        maxZoom={16}
         scrollWheelZoom={true}
       >
         <TileLayer
