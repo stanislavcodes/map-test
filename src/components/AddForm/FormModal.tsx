@@ -61,7 +61,12 @@ export const FormModal = ({ isOpen, onClose }: FormModalProps) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      isCentered
+      size={{ base: 'full', md: 'md' }}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader color="green.500">Adding a new place</ModalHeader>
