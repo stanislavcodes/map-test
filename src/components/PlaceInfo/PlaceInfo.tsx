@@ -54,6 +54,7 @@ export const PlaceInfo = ({ place, onEdit }: PlacePopupProps) => {
         <Button
           size={'sm'}
           variant="ghost"
+          colorScheme='red'
           onClick={handleDelete}
           flexGrow={1}
           isDisabled={isLoading}
