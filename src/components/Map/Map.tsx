@@ -1,15 +1,21 @@
 import { Box } from '@chakra-ui/react';
 import { Map as MapType } from 'leaflet';
-import { useEffect, useRef } from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { useEffect,useRef } from 'react';
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+} from 'react-leaflet';
 import { Coords } from '~/types/Coords';
 import { Place } from '~/types/Place';
+import { MapMarkers } from '../MapMarkers/MapMarkers';
 import { PlaceInfo } from '../PlaceInfo';
 
 interface MapProps {
   places: Place[];
   addedPlace: Coords;
-  onEdit: (place: Place) => void;
+  onEdit: (place: Partial<Place>) => void;
 }
 
 export const Map = ({ places, addedPlace, onEdit }: MapProps) => {
@@ -24,6 +30,10 @@ export const Map = ({ places, addedPlace, onEdit }: MapProps) => {
       }
     }
   }, [addedPlace]);
+
+  const handleMapClick = (lat: number, lang: number) => {
+    onEdit({ latitude: lat, longitude: lang });
+  };
 
   return (
     <Box flexGrow={1}>
@@ -54,6 +64,8 @@ export const Map = ({ places, addedPlace, onEdit }: MapProps) => {
             </Popup>
           </Marker>
         ))}
+
+        <MapMarkers saveMarkers={handleMapClick} />
       </MapContainer>
     </Box>
   );

@@ -8,24 +8,31 @@ import { Place } from './types/Place';
 
 function App() {
   const { data: places = [] } = useGetPlaces();
-  const [editData, setEditData] = useState<Place | null>(null);
+  const [data, setData] = useState<Partial<Place> | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addedPlace, setAddedPlace] = useState<Coords>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
 
   const closeModal = (latitude?: number, longitude?: number) => {
-    setEditData(null);
+    setData(null);
     setIsModalOpen(false);
+    setIsEditing(false);
 
     if (latitude && longitude) {
       setAddedPlace({ latitude, longitude });
     }
   };
 
-  const startEditing = useCallback((place: Place) => {
+  const startEditing = useCallback((place: Partial<Place>) => {
     setIsModalOpen(true);
-    setEditData(place);
+
+    if (place.id) {
+      setIsEditing(true);
+    }
+
+    setData(place);
   }, []);
 
   return (
@@ -43,12 +50,17 @@ function App() {
 
         <FormModal
           isOpen={isModalOpen}
-          initialData={editData}
+          isEditing={isEditing}
+          initialData={data}
           onClose={closeModal}
         />
       </Flex>
 
-      <Map places={places} addedPlace={addedPlace} onEdit={startEditing} />
+      <Map
+        places={places}
+        addedPlace={addedPlace}
+        onEdit={startEditing}
+      />
     </Flex>
   );
 }

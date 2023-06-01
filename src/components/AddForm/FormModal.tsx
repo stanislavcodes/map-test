@@ -13,8 +13,8 @@ import {
   Textarea,
   VStack,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useEffect,useState } from 'react';
+import { SubmitHandler,useForm } from 'react-hook-form';
 import { useCreatePlace } from '~/api/useCreatePlace';
 import { useUpdatePlace } from '~/api/useUpdatePlace';
 import { Place } from '~/types/Place';
@@ -22,12 +22,18 @@ import { PlacePayload } from '~/types/PlacePayload';
 
 interface FormModalProps {
   isOpen: boolean;
-  initialData: Place | null;
+  isEditing: boolean;
+  initialData: Partial<Place> | null;
   onClose: (latitude?: number, longitude?: number) => void;
 }
 
-export const FormModal = ({ isOpen, initialData, onClose }: FormModalProps) => {
-  const [editData, setEditData] = useState<PlacePayload | null>(null);
+export const FormModal = ({
+  isOpen,
+  isEditing,
+  initialData,
+  onClose,
+}: FormModalProps) => {
+  const [editData, setEditData] = useState<Partial<PlacePayload> | null>(null);
 
   const {
     handleSubmit,
@@ -56,10 +62,10 @@ export const FormModal = ({ isOpen, initialData, onClose }: FormModalProps) => {
   useEffect(() => {
     if (initialData) {
       setEditData(initialData);
-      setValue('name', initialData.name);
-      setValue('description', initialData.description);
-      setValue('latitude', initialData.latitude);
-      setValue('longitude', initialData.longitude);
+      setValue('name', initialData?.name || '');
+      setValue('description', initialData?.description || '');
+      setValue('latitude', initialData?.latitude || 0);
+      setValue('longitude', initialData.longitude || 0);
     }
   }, [initialData]);
 
@@ -73,7 +79,7 @@ export const FormModal = ({ isOpen, initialData, onClose }: FormModalProps) => {
       longitude: Number(values.longitude),
     };
 
-    if (editData && initialData) {
+    if (isEditing && initialData && initialData.id) {
       updatePlace({
         id: initialData.id,
         ...data,
@@ -154,7 +160,7 @@ export const FormModal = ({ isOpen, initialData, onClose }: FormModalProps) => {
               </FormControl>
 
               <FormControl
-                isDisabled={isSubmitting || !!editData}
+                isDisabled={isSubmitting || isEditing}
                 isInvalid={!!errors.latitude}
               >
                 <FormLabel>{'Latitude (-90, 90):'}</FormLabel>
@@ -176,7 +182,7 @@ export const FormModal = ({ isOpen, initialData, onClose }: FormModalProps) => {
               </FormControl>
 
               <FormControl
-                isDisabled={isSubmitting || !!editData}
+                isDisabled={isSubmitting || isEditing}
                 isInvalid={!!errors.longitude}
               >
                 <FormLabel>{'Longitude (-180, 180):'}</FormLabel>
@@ -202,9 +208,9 @@ export const FormModal = ({ isOpen, initialData, onClose }: FormModalProps) => {
                 colorScheme="green"
                 width="full"
                 isLoading={isCreating || isUpdating}
-                loadingText={editData ? 'Updating' : 'Creating'}
+                loadingText={isEditing ? 'Updating' : 'Creating'}
               >
-                {editData ? 'Update' : 'Create'}
+                {isEditing ? 'Update' : 'Create'}
               </Button>
             </VStack>
           </form>
