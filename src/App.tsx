@@ -1,5 +1,5 @@
-import { Button,Flex } from '@chakra-ui/react';
-import { useCallback,useState } from 'react';
+import { Button, Flex, Text } from '@chakra-ui/react';
+import { useCallback, useState } from 'react';
 import { Map } from '~/components/Map';
 import { useGetPlaces } from './api/useGetPlaces';
 import { FormModal } from './components/AddForm';
@@ -43,10 +43,14 @@ function App() {
       p={{ base: 4, md: 6 }}
       gap={4}
     >
-      <Flex gap={4}>
+      <Flex gap={4} align={'center'}>
         <Button onClick={openModal} colorScheme="green">
           Add place
         </Button>
+
+        <Text fontSize={{ base: '14px', sm: '16px' }}>
+          Or just click on the map
+        </Text>
 
         <FormModal
           isOpen={isModalOpen}
@@ -56,11 +60,7 @@ function App() {
         />
       </Flex>
 
-      <Map
-        places={places}
-        addedPlace={addedPlace}
-        onEdit={startEditing}
-      />
+      <Map places={places} addedPlace={addedPlace} onEdit={startEditing} />
     </Flex>
   );
 }
